@@ -96,7 +96,34 @@ class spider(object):
         }
         return login_data,response.cookies
 
+    def ucard_login_data_parser(self,url):
+        
+        response=requests.get(url)
+        html=response.text
+        # parse the html
+        soup=BeautifulSoup(html,'lxml')
+        print(soup.prettify())
+        next_url = soup.find('input', {'name': 'NextUrl'})['value']
+        check_code=''
+        img_url= soup.find('img', {'id': 'imgCheckCode'})['src']
+        img_url='http://api.xzxyun.com/Account/'+img_url
+        img=self.get_img(img_url,'check_code')
 
+        print(img)
+        #'http://api.xzxyun.com/Account/Login/Account/GetCheckCodeImg?rad=9'
+        #http://api.xzxyun.com/Account/GetCheckCodeImg?rad=52
+
+        openid=''
+        login_data={
+            'SchoolCode':'xahu',#input('input your school name'),
+            'SignType':'SynSno',#input('input your SignType,"SynSno" or "SynCard"')
+            'UserAccount':input('input your User Account'),
+            'Password':input('input your Password'),
+            'NextUrl':next_url,
+            'CheckCode':check_code,
+            'openid':openid,
+        }
+        return login_data,response.cookies
 
 
 
@@ -108,12 +135,12 @@ if __name__ == "__main__":
     login_url="http://ids.chd.edu.cn/authserver/login?service=http%3A%2F%2Fportal.chd.edu.cn%2F"
     target_url="http://portal.chd.edu.cn/"
 
-    #login_url_ucard='http://api.xzxyun.com/Account/Login/'
+    login_url_ucard='http://api.xzxyun.com/Account/Login/'
 
     img_url='https://HaneChiri.github.io/blog_images/article/simple_inverted_index.png'
     sp=spider()
-    sp.login(login_url,chd_login_data_parser,target_url)
-    #sp.login(login_url_ucard,sp.ucard_login_data_parser)
+    #sp.login(login_url,chd_login_data_parser,target_url)
+    sp.login(login_url_ucard,sp.ucard_login_data_parser)
     #sp.get_img(img_url)
 
 
