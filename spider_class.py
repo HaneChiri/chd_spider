@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from lxml import etree
 
 class spider(object):
     def __init__(self):
@@ -140,8 +141,9 @@ if __name__ == "__main__":
     img_url='https://HaneChiri.github.io/blog_images/article/simple_inverted_index.png'
     sp=spider()
     #sp.login(login_url,chd_login_data_parser,target_url)
-    sp.login(login_url_ucard,sp.ucard_login_data_parser)
+    #sp.login(login_url_ucard,sp.ucard_login_data_parser)
     #sp.get_img(img_url)
+
 
 
 
