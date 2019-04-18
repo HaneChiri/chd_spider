@@ -68,10 +68,9 @@ if __name__ == "__main__":
         'charset':'utf8'
     }
     test_record={
-        'title':'test_title',
-        'content':'test_content'
+        'idnew_table':'233'
     }
 
     mydb=MyDatabase(**db_data)
-    mydb.insert('news','spider',test_record)
+    mydb.insert('news','new_table',test_record)
     del mydb

@@ -65,15 +65,18 @@ class parser():
     
 
     def uni_parser(self,url,xpath,**kwargs):
-        html=requests.post(url,**kwargs).text
+
+        response=requests.post(url,**kwargs)
+        html=response.text
         tree=etree.HTML(html)
+        print(html)
         result_list=tree.xpath(xpath)
         return result_list
     
     def chd_get_urls(self,url,**kwargs):
         pass
         #get page number
-        xpath='//div[@class="pagination-info clearFix"]/span[0]/text()'
+        xpath='//*[@id="blf40571"]/li[2]/a[2]/text()'
         x=self.uni_parser(url,xpath,**kwargs)
         print(x)
         #repeat get single catalogue's urls
@@ -85,13 +88,16 @@ class spider(object):
     def __init__(self):
         self.cookies=None
         self.headers={
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
+
+            
+            "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
         }
+        
         self.parser=parser()#spider's parser
         
     
 
-    def login(self,login_url,login_data_parser=None,target_url=None):
+    def login(self,login_url,target_url,login_data_parser=None):
         '''
         login
         :param login_url: the url you want to login
@@ -109,8 +115,30 @@ class spider(object):
         if(login_data_parser!=None and callable(login_data_parser)):
             login_data,cookies=login_data_parser(login_url)
 
-        #login
-        response=requests.post(login_url,headers=self.headers,data=login_data,cookies=cookies)
+        #login without redirecting
+        response=requests.post(login_url,headers=self.headers,data=login_data,cookies=cookies,allow_redirects=False)
+
+
+        cookies_num=1
+        while(target_url!=None and response.url!=target_url):#if spider is not reach the target page
+            print('[spider]: I am at the "{}" now'.format(response.url))
+            print('[spider]: I have got a cookie!Its content is that \n"{}"'.format(response.cookies))
+            #merge the two cookies
+            cookies=dict(cookies,**response.cookies)
+            cookies=requests.utils.cookiejar_from_dict(cookies)
+            cookies_num+=1
+            print('[spider]: Now I have {} cookies!'.format(cookies_num))
+            next_station=response.headers['Location']
+            print('[spider]: Then I will go to the page whose url is "{}"'.format(next_station))
+            response=requests.post(next_station,headers=self.headers,cookies=cookies,allow_redirects=False)
+
+        cookies=dict(cookies,**response.cookies)
+        cookies=requests.utils.cookiejar_from_dict(cookies)
+        cookies_num+=1
+
+        print(type(cookies))
+        print(cookies)
+
 
         if(target_url!=None and response.url==target_url):
             print("login successfully")
@@ -160,12 +188,16 @@ if __name__ == "__main__":
 
     bulletin_url='http://portal.chd.edu.cn/detach.portal?.pmn=view&.ia=false&action=bulletinsMoreView&search=true&.f=f40571&.pen=pe65&groupid=all'
 
+    
     login_url_ucard='http://api.xzxyun.com/Account/Login/'
 
     img_url='https://HaneChiri.github.io/blog_images/article/simple_inverted_index.png'
     sp=spider()
-    sp.login(login_url,sp.parser.chd_login_data_parser,target_url)
+    sp.login(login_url,target_url,sp.parser.chd_login_data_parser)
     sp.parser.chd_get_urls(bulletin_url,cookies=sp.cookies,headers=sp.headers)
+
+
+
 
 
 
