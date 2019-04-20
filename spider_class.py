@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from lxml import etree
-
+import my_database
+import pymysql
 
 class parser():
     def chd_login_data_parser(self,url):
@@ -104,7 +105,7 @@ class parser():
         xpath='//*[@id="bulletin_content"]//ul[contains(@class,"rss-container")]//a[@class="rss-title"]/@href'
         url_list=[]
         
-        for i in range(1,1+1):
+        for i in range(1,page_num+1):
             #get single catalogue's urls
             rss_title=self.uni_parser(bulletin_url,xpath,params=para,**kwargs)
             for i in rss_title:
@@ -133,14 +134,14 @@ class parser():
 
 
 class spider(object):
-    def __init__(self):
+    def __init__(self,db_data):
         self.cookies=None
         self.headers={
 
             
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
         }
-        
+        self.db_data=db_data
         self.parser=parser()#spider's parser
         
     
@@ -215,9 +216,16 @@ class spider(object):
 
 
     def save(self,content):
-        pass
+        
+        mydb=my_database.MyDatabase(**db_data)
 
-    def crawl(self,)
+        record={
+            'content':pymysql.escape_string(content)
+        }
+        
+        
+        mydb.insert('dbase','bulletin',record)
+
 
 
 
@@ -233,15 +241,25 @@ if __name__ == "__main__":
     login_url="http://ids.chd.edu.cn/authserver/login?service=http%3A%2F%2Fportal.chd.edu.cn%2F"
     target_url="http://portal.chd.edu.cn/"
 
-    
+    db_data={
+        'host':'127.0.0.1',
+        'user':'root',
+        'passwd':'password',
+        'port':3306,
+        'charset':'utf8'
+    }
 
     
     login_url_ucard='http://api.xzxyun.com/Account/Login/'
 
     img_url='https://HaneChiri.github.io/blog_images/article/simple_inverted_index.png'
-    sp=spider()
+    sp=spider(db_data)
     sp.login(login_url,target_url,sp.parser.chd_login_data_parser)
-    sp.parser.chd_get_urls(cookies=sp.cookies,headers=sp.headers)
+    url_list=sp.parser.chd_get_urls(cookies=sp.cookies,headers=sp.headers)
+    for i in url_list:
+        content=sp.parser.chd_get_content(i,cookies=sp.cookies,headers=sp.headers)
+        sp.save(content)
+
 
 
 
