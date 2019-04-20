@@ -65,22 +65,70 @@ class parser():
     
 
     def uni_parser(self,url,xpath,**kwargs):
-
+    
         response=requests.post(url,**kwargs)
         html=response.text
         tree=etree.HTML(html)
-        print(html)
         result_list=tree.xpath(xpath)
+
         return result_list
     
-    def chd_get_urls(self,url,**kwargs):
-        pass
+    def chd_get_urls(self,**kwargs):
+        '''
+        get all urls that needs to crawl.
+        '''
+        #prepare
+        base_url='http://portal.chd.edu.cn/'
+        index_url='http://portal.chd.edu.cn/index.portal?.pn=p167'
+        bulletin_url='http://portal.chd.edu.cn/detach.portal'
+        para = {
+            'pageIndex': 1,
+            'pageSize': '',
+            '.pmn': 'view',
+            '.ia': 'false',
+            'action': 'bulletinsMoreView',
+            'search': 'true',
+            'groupid': 'all',
+            '.pen': 'pe65'
+        }
+        requests.post(index_url,**kwargs)
+        
         #get page number
-        xpath='//*[@id="blf40571"]/li[2]/a[2]/text()'
-        x=self.uni_parser(url,xpath,**kwargs)
-        print(x)
+        xpath='//*[@id="bulletin_content"]/div[2]/div/span/text()'
+        num=self.uni_parser(bulletin_url,xpath,params=para,**kwargs)
+        num=num[0].strip().split("/")
+        total=num[0]
+        page_num=num[1]
+        
         #repeat get single catalogue's urls
+        xpath='//*[@id="bulletin_content"]//ul[contains(@class,"rss-container")]//a[@class="rss-title"]/@href'
+        url_list=[]
+        
+        for i in range(1,1+1):
+            #get single catalogue's urls
+            rss_title=self.uni_parser(bulletin_url,xpath,params=para,**kwargs)
+            for i in rss_title:
+                url_list.append(base_url+str(i))
+            para['pageIndex'] = i
 
+        #echo
+        for i in url_list:
+            print(i)
+        print(len(url_list))
+
+        return url_list
+
+    def chd_get_content(self,url,**kwargs):
+        '''
+        get content from the parameter "url"
+        '''
+        html=requests.post(url,**kwargs).text
+        soup=BeautifulSoup(html,'lxml')
+        content=soup.find('div',id='content')
+        content=str(content)
+        return content
+        
+        
 
 
 
@@ -136,8 +184,7 @@ class spider(object):
         cookies=requests.utils.cookiejar_from_dict(cookies)
         cookies_num+=1
 
-        print(type(cookies))
-        print(cookies)
+        
 
 
         if(target_url!=None and response.url==target_url):
@@ -145,9 +192,7 @@ class spider(object):
 
         self.cookies=cookies
         return response
-        
-    
-        
+     
 
     def get_img(self,url,output_name=None,cookies=None):
         '''
@@ -169,8 +214,10 @@ class spider(object):
         return img
 
 
-    def save(self):
+    def save(self,content):
         pass
+
+    def crawl(self,)
 
 
 
@@ -186,7 +233,7 @@ if __name__ == "__main__":
     login_url="http://ids.chd.edu.cn/authserver/login?service=http%3A%2F%2Fportal.chd.edu.cn%2F"
     target_url="http://portal.chd.edu.cn/"
 
-    bulletin_url='http://portal.chd.edu.cn/detach.portal?.pmn=view&.ia=false&action=bulletinsMoreView&search=true&.f=f40571&.pen=pe65&groupid=all'
+    
 
     
     login_url_ucard='http://api.xzxyun.com/Account/Login/'
@@ -194,7 +241,7 @@ if __name__ == "__main__":
     img_url='https://HaneChiri.github.io/blog_images/article/simple_inverted_index.png'
     sp=spider()
     sp.login(login_url,target_url,sp.parser.chd_login_data_parser)
-    sp.parser.chd_get_urls(bulletin_url,cookies=sp.cookies,headers=sp.headers)
+    sp.parser.chd_get_urls(cookies=sp.cookies,headers=sp.headers)
 
 
 
