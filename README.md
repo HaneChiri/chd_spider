@@ -26,7 +26,11 @@ This is a repository for spider learning.
 
 - [x] spider.login()
 - [x] MyDatabase.insert()
-- [ ] spider.get_urls()#get all urls to crawl,return a url list
-- [ ] spider.parse()#parse single page by a callback function,return a result dict
-- [ ] spider.crawl()#call spider's method to crawl a site
+- [x] spider.get_urls()#get all urls to crawl,return a url list
+- [x] spider.parse()#parse single page by a callback function,return a result dict
+- [x] spider.crawl()#call spider's method to crawl a site
 - [ ] etc.
+
+# run
+
+run the 'chd_bulletin_spider.py'
