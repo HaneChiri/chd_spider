@@ -1,9 +1,14 @@
 import requests
 
 class MySpider(object):
-    def __init__(self,parser,save):
+    def __init__(self,parser,save,**save_params):
         self.parser=parser#parser is a object of class
         self.save=save#save is a function
+        self.save_params=save_params
+        self.cookies=None
+        self.headers={
+            "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
+        }
 
     def login(self,login_url,home_page_url):
         '''
@@ -48,10 +53,10 @@ class MySpider(object):
 
     def crawl(self,login_url,home_page_url,catalogue_url):
         self.login(login_url,home_page_url)
-        url_list=self.parser.get_urls(catalogue_url)
+        url_list=self.parser.get_urls(catalogue_url,cookies=self.cookies,headers=self.headers)
         for url in url_list:
-            content=self.parser.get_content(url)
-            self.save(content)
+            content=self.parser.get_content(url,cookies=self.cookies,headers=self.headers)
+            self.save(content,**self.save_params)
 
 
     def __del__(self):
