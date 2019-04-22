@@ -6,7 +6,6 @@ class MyDatabase(object):
         self.conn=pymysql.connect(*args,**kwargs)
         self.cursor=self.conn.cursor()
         
-        
 
     def insert(self,db,table,record_dict):
         '''
@@ -50,8 +49,34 @@ class MyDatabase(object):
         self.cursor.execute(sql)
         self.conn.commit()
     
+    def table_isexist(self,db,table):
+        sql='use {}'.format(db)
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+        sql='show tables;'
+        self.cursor.execute(sql)
+        for i in self.cursor.fetchall():
+            if table in i:
+                return True
+        else:
+            return False
+
+    def db_isexist(self,db):
+        sql='show databases;'
+        self.cursor.execute(sql)
+        for i in self.cursor.fetchall():
+            if db in i:
+                print('True')
+                return True
+        else:
+            print('False')
+            return False
+
     def show(self):
         pass
+
+
 
 
     def __del__(self):
@@ -72,5 +97,6 @@ if __name__ == "__main__":
     }
 
     mydb=MyDatabase(**db_data)
-    mydb.insert('news','new_table',test_record)
+    #mydb.insert('news','new_table',test_record)
+    mydb.db_isexist('db1')
     del mydb
