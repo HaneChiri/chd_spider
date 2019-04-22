@@ -59,7 +59,7 @@ class MySpider(object):
         for url in url_list:
             counter+=1
             #report
-            print('[@spider]:get content({}%): {}/{}'.format(round(counter/total,2),counter,total))
+            print('[@spider]:get content({}%): {}/{}'.format(round((counter/total)*100,2),counter,total))
 
             record_dict=self.parser.get_content(url,cookies=self.cookies,headers=self.headers)
             self.archiver.save(record_dict)

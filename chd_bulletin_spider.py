@@ -77,7 +77,7 @@ class chdParser(MyParser):
         url_list=[]
         
         
-        for i in range(1,page_num+1):
+        for i in range(1,3+1):
             para['pageIndex'] = i
             #report
             print("[@parser]:get urls({}%): {}/{}".format(round((i/page_num)*100,1),i,page_num))
@@ -88,6 +88,24 @@ class chdParser(MyParser):
 
         return url_list
     
+    def get_content(self,url,**kwargs):
+        '''
+        get content from the parameter "url"
+        '''
+
+        html=requests.post(url,**kwargs).text
+        soup=BeautifulSoup(html,'lxml')
+        html=str(soup.find('div',id='content'))
+        title=str(soup.find('div',class_='bulletin-title').text).strip()
+        
+        record_dict={
+            'url':url,
+            'title':title,
+            'html':pymysql.escape_string(html)
+        }
+
+        return record_dict
+
     
 class chdArchiver(MyArchiver):
     pass
@@ -112,7 +130,7 @@ if __name__ == '__main__':
     
 
     parser=chdParser()
-    archiver=chdArchiver('dbase','bulletin',**connect_config)
+    archiver=chdArchiver('dbase','spider',**connect_config)
     
     sp=chdSpider(parser,archiver,**connect_config)
     sp.crawl(login_url,home_page_url,catalogue_url)

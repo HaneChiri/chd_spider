@@ -80,8 +80,20 @@ class MyDatabase(object):
         self.execute(sql)
 
 
-    def show(self):
-        pass
+    def record_isexist(self,db,table,primary_key,find_value):
+        sql='use {}'.format(db)
+        self.execute(sql)
+
+        sql='select * from {} where {}="{}"'.format(table,primary_key,find_value)
+        res=self.execute(sql)
+
+        if res!=tuple():
+            return True
+
+        else:
+            return False
+
+
 
     
 
@@ -105,7 +117,6 @@ if __name__ == "__main__":
     }
 
     mydb=MyDatabase(**db_data)
-    #mydb.insert('news','new_table',test_record)
-    #mydb.db_isexist('d1')
-    mydb.create_db('a')
-    del mydb
+    
+    mydb.record_isexist('news','spider','title','2019年度因公国公示12')
+    
