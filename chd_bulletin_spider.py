@@ -1,6 +1,7 @@
 from my_spider import MySpider
 from my_parser import MyParser
 from my_database import MyDatabase
+from my_archiver import MyArchiver
 from bs4 import BeautifulSoup
 import requests
 import pymysql
@@ -13,6 +14,9 @@ class chdParser(MyParser):
         :param url: the url you want to login
         :return (a dict with login data,cookies)
         '''
+        #report
+        print('[@parser]:get login data')
+
         response=requests.get(login_url)
         html=response.text
         # parse the html
@@ -33,6 +37,11 @@ class chdParser(MyParser):
             '_eventId': _eventId,
             'rmShown': rmShown
         }
+
+
+        #report
+        print('[@parser]:get login data (has done)')
+
         return login_data,response.cookies
 
     
@@ -61,7 +70,7 @@ class chdParser(MyParser):
         num=self.uni_parser(cata_base_url,xpath,params=para,**kwargs)
         num=num[0].strip().split("/")
         total=int(num[0])
-        page_num=(num[1])
+        page_num=int(num[1])
         
         #repeat get single catalogue's urls
         xpath='//*[@id="bulletin_content"]//ul[contains(@class,"rss-container")]//a[@class="rss-title"]/@href'
@@ -70,6 +79,8 @@ class chdParser(MyParser):
         
         for i in range(1,page_num+1):
             para['pageIndex'] = i
+            #report
+            print("[@parser]:get urls({}%): {}/{}".format(round((i/page_num)*100,1),i,page_num))
             #get single catalogue's urls
             urls=self.uni_parser(cata_base_url,xpath,params=para,**kwargs)
             for url in urls:
@@ -78,14 +89,11 @@ class chdParser(MyParser):
         return url_list
     
     
-def save(content,**save_params):
+class chdArchiver(MyArchiver):
+    pass
 
-    mydb=MyDatabase(**save_params)
-
-    record={
-        'content':pymysql.escape_string(content)
-    }
-    mydb.insert('dbase','bulletin',record)
+class chdSpider(MySpider):
+    pass
 
 
 if __name__ == '__main__':
@@ -94,14 +102,18 @@ if __name__ == '__main__':
     home_page_url="http://portal.chd.edu.cn/"
     catalogue_url="http://portal.chd.edu.cn/detach.portal?.pmn=view&.ia=false&action=bulletinsMoreView&search=true&.f=f40571&.pen=pe65&groupid=all"
 
-    parser=chdParser()
-    save_params={
+    connect_config={
         'host':'127.0.0.1',
         'user':'root',
         'passwd':'password',
         'port':3306,
-        'charset':'utf8'
+        'charset':'utf8',
     }
-    sp=MySpider(parser,save,**save_params)
+    
+
+    parser=chdParser()
+    archiver=chdArchiver('dbase','bulletin',**connect_config)
+    
+    sp=chdSpider(parser,archiver,**connect_config)
     sp.crawl(login_url,home_page_url,catalogue_url)
     

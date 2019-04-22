@@ -1,10 +1,11 @@
 import requests
 
 class MySpider(object):
-    def __init__(self,parser,save,**save_params):
+    def __init__(self,parser,archiver,**config):
         self.parser=parser#parser is a object of class
-        self.save=save#save is a function
-        self.save_params=save_params
+        self.archiver=archiver#archiver is a object of class
+        self.config=config
+
         self.cookies=None
         self.headers={
             "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
@@ -30,15 +31,11 @@ class MySpider(object):
 
         cookies_num=1
         while(home_page_url!=None and response.url!=home_page_url):#if spider is not reach the target page
-            print('[spider]: I am at the "{}" now'.format(response.url))
-            print('[spider]: I have got a cookie!Its content is that \n"{}"'.format(response.cookies))
             #merge the two cookies
             cookies=dict(cookies,**response.cookies)
             cookies=requests.utils.cookiejar_from_dict(cookies)
             cookies_num+=1
-            print('[spider]: Now I have {} cookies!'.format(cookies_num))
             next_station=response.headers['Location']
-            print('[spider]: Then I will go to the page whose url is "{}"'.format(next_station))
             response=requests.post(next_station,headers=self.headers,cookies=cookies,allow_redirects=False)
 
         cookies=dict(cookies,**response.cookies)
@@ -52,11 +49,20 @@ class MySpider(object):
         return response
 
     def crawl(self,login_url,home_page_url,catalogue_url):
+        #login
         self.login(login_url,home_page_url)
+        #get urls
         url_list=self.parser.get_urls(catalogue_url,cookies=self.cookies,headers=self.headers)
+        #repeat get page content
+        counter=0
+        total=len(url_list)
         for url in url_list:
-            content=self.parser.get_content(url,cookies=self.cookies,headers=self.headers)
-            self.save(content,**self.save_params)
+            counter+=1
+            #report
+            print('[@spider]:get content({}%): {}/{}'.format(round(counter/total,2),counter,total))
+
+            record_dict=self.parser.get_content(url,cookies=self.cookies,headers=self.headers)
+            self.archiver.save(record_dict)
 
 
     def __del__(self):

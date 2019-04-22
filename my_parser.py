@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lxml import etree
+import pymysql
 
 class MyParser(object):
     def login_data_parser(self,login_url):
@@ -9,6 +10,9 @@ class MyParser(object):
         :param url: the url you want to login
         :return (a dict with login data,cookies)
         '''
+        #report
+        print('[@parser]:get login data')
+
         response=requests.get(login_url)
         html=response.text
         # parse the html
@@ -18,6 +22,10 @@ class MyParser(object):
         login_data={
             'example_data':example_data
         }
+
+
+        #report
+        print('[@parser]:get login data (has done)')
         return login_data,response.cookies
     
     def uni_parser(self,url,xpath,**kwargs): 
@@ -49,6 +57,8 @@ class MyParser(object):
         
         for i in range(1,page_num+1):
             para['pageIndex'] = i
+            #report
+            print("[@parser]:get urls({}%): {}/{}".format(round((i/page_num)*100,1),i,page_num))
             #get single catalogue's urls
             urls=self.uni_parser(cata_base_url,xpath,params=para,**kwargs)
             for url in urls:
@@ -62,8 +72,13 @@ class MyParser(object):
         '''
         get content from the parameter "url"
         '''
+
         html=requests.post(url,**kwargs).text
         soup=BeautifulSoup(html,'lxml')
         content=soup.find('div',id='content')
         content=str(content)
-        return content
+        record_dict={
+            'content':pymysql.escape_string(content)
+        }
+
+        return record_dict
