@@ -5,7 +5,11 @@ class MyDatabase(object):
     def __init__(self,*args,**kwargs):
         self.conn=pymysql.connect(*args,**kwargs)
         self.cursor=self.conn.cursor()
-        
+
+    def execute(self,sql):
+        self.cursor.execute(sql)
+        self.conn.commit()
+        return self.cursor.fetchall()
 
     def insert(self,db,table,record_dict):
         '''
@@ -16,8 +20,7 @@ class MyDatabase(object):
 
         '''
         sql='use {}'.format(db)
-        self.cursor.execute(sql)
-        self.conn.commit()
+        self.execute(sql)
 
         sql='insert into {}('.format(table)
         
@@ -41,22 +44,14 @@ class MyDatabase(object):
         sql+=')'
 
 
-        print(sql)
-
-            
-
-
-        self.cursor.execute(sql)
-        self.conn.commit()
+        self.execute(sql)
     
     def table_isexist(self,db,table):
         sql='use {}'.format(db)
-        self.cursor.execute(sql)
-        self.conn.commit()
+        self.execute(sql)
 
         sql='show tables;'
-        self.cursor.execute(sql)
-        for i in self.cursor.fetchall():
+        for i in self.execute(sql):
             if table in i:
                 return True
         else:
@@ -65,7 +60,7 @@ class MyDatabase(object):
     def db_isexist(self,db):
         sql='show databases;'
         self.cursor.execute(sql)
-        for i in self.cursor.fetchall():
+        for i in self.execute(sql):
             if db in i:
                 print('True')
                 return True
@@ -73,9 +68,22 @@ class MyDatabase(object):
             print('False')
             return False
 
+    def create_db(self,db):
+        sql='create database {};'.format(db)
+        self.execute(sql)
+    
+    def create_table(self,db,table,column):
+        sql='use {}'.format(db)
+        self.execute(sql)
+
+        sql='create table {};'.format(table)
+        self.execute(sql)
+
+
     def show(self):
         pass
 
+    
 
 
 
@@ -98,5 +106,6 @@ if __name__ == "__main__":
 
     mydb=MyDatabase(**db_data)
     #mydb.insert('news','new_table',test_record)
-    mydb.db_isexist('db1')
+    #mydb.db_isexist('d1')
+    mydb.create_db('a')
     del mydb
