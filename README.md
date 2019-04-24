@@ -20,12 +20,12 @@
 | ---------------------- | ------------------------------------------------------------ |
 | newsSpider.py          | 第一版实现功能的代码，只是简单地将代码装在函数内             |
 | bulletin_spider.py     | A modified version of  `newsSpider.py`,with some bugs        |
-| spider_class.py        | A modified version of  `bulletin_spider.py`,without completing |
+| spider_class.py        | 第三版，进一步优化                                           |
 | my_database.py         | 对pymysql模块的简单封装                                      |
 | my_spider.py           | 定义了爬虫类的基类，构造时需要传入MyParser类的解析器，和MyArchiver类的存档器 |
 | my_parser.py           | 给MySpider类使用的解析器的基类                               |
 | my_Archiver.py         | 给MySpider类使用的存档器的基类，目前仅支持基于pymysql的数据库存储，以后可能会增加新的存储方式 |
-| chd_bulletin_spider.py | 爬取长安大学信息门户公告，并存到数据库                       |
+| chd_bulletin_spider.py | 第四版，爬取长安大学信息门户公告，并存到数据库               |
 
 
 
@@ -46,8 +46,6 @@
 - [x] 全面注释
 
 - [x] 爬取去重
-
-- [ ] 生成文档
 
 - [ ] 实时更新
 
