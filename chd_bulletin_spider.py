@@ -1,3 +1,13 @@
+'''
+模块名: chd_bulletin_spider
+定义的类：chdParser(MyParser),chdArchiver(MyArchiver),chdSpider(MySpider)
+简介：爬取长安大学信息门户公告，并存到数据库
+目前已知的bug或者缺陷：
+- 新闻链接混杂着绝对链接和相对链接，遇到绝对链接时会出错，正在修复
+- 需要已经创建好的数据库和表，正在修改为能自动检测并创建相应的表
+- 很多函数还没有完整的错误处理
+'''
+
 from my_spider import MySpider
 from my_parser import MyParser
 from my_database import MyDatabase
@@ -7,17 +17,11 @@ import requests
 import pymysql
 
 class chdParser(MyParser):
-    
     def login_data_parser(self,login_url):
         '''
-        登录
-        :param login_url: 登录页面的网址
-        :param home_page_url: 登录之后跳转到的页面，一般而言是主页，以下称其为主页
-
-        流程：
-        1.获取登录表单信息（例如账号密码以及隐藏域）
-        2.一步步跳转到主页以获取完整cookies并储存在对象属性当中
-
+        长安大学登录表单数据解析
+        :param login_url: 登录页面的url
+        :return (登录信息字典,获取时得到的cookies)
         '''
         #report
         print('[@parser]:get login data')
@@ -52,7 +56,9 @@ class chdParser(MyParser):
     
     def get_urls(self,catalogue_url,**kwargs):
         '''
-        get all urls that needs to crawl.
+        获取目录页的url
+        :param catalogue_url:目录页的url
+        :param **kwargs:cookies和headers可以从这里传入
         '''
         #prepare
         base_url='http://portal.chd.edu.cn/'
@@ -95,19 +101,29 @@ class chdParser(MyParser):
     
     def get_content(self,url,**kwargs):
         '''
-        get content from the parameter "url"
+        获取内容
+        :param url:需要解析的网页的url
+        :return: 用于传给存档器的 记录字典，键为字段名，值为值
         '''
-
-        html=requests.post(url,**kwargs).text
-        soup=BeautifulSoup(html,'lxml')
-        html=str(soup.find('div',id='content'))
-        title=str(soup.find('div',class_='bulletin-title').text).strip()
-        
-        record_dict={
-            'url':url,
-            'title':title,
-            'html':pymysql.escape_string(html)
-        }
+        try:
+            html=requests.post(url,**kwargs).text
+            soup=BeautifulSoup(html,'lxml')
+            html=str(soup.find('div',id='content'))
+            title=str(soup.find('div',class_='bulletin-title').text).strip()
+            
+            record_dict={
+                'url':url,
+                'title':title,
+                'html':pymysql.escape_string(html)
+            }
+        except:
+            print('There is an exception when parser "{}"'.format(url))
+            record_dict={
+                'url':url,
+                'title':'There is an exception when parser "{}"'.format(url),
+                'html':'error'
+            }
+            return 
 
         return record_dict
 
@@ -121,10 +137,12 @@ class chdSpider(MySpider):
 
 if __name__ == '__main__':
 
+    #url配置
     login_url="http://ids.chd.edu.cn/authserver/login?service=http%3A%2F%2Fportal.chd.edu.cn%2F"
     home_page_url="http://portal.chd.edu.cn/"
     catalogue_url="http://portal.chd.edu.cn/detach.portal?.pmn=view&.ia=false&action=bulletinsMoreView&search=true&.f=f40571&.pen=pe65&groupid=all"
 
+    #数据库连接配置
     connect_config={
         'host':'127.0.0.1',
         'user':'root',
@@ -132,11 +150,13 @@ if __name__ == '__main__':
         'port':3306,
         'charset':'utf8',
     }
-    
+    database_name='dbase'
+    table_name='spider'#表需要的字段：url,title,html，类型Varchar,大小够装就行，url(255),title(255),html(8000或者使用tex类型)
 
+    #创建解析器和存档器
     parser=chdParser()
-    archiver=chdArchiver('dbase','spider',**connect_config)
-    
+    archiver=chdArchiver(database_name,table_name,**connect_config)
+    #召唤小蜘蛛:D
     sp=chdSpider(parser,archiver)
     sp.crawl(login_url,home_page_url,catalogue_url)
     
