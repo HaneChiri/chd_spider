@@ -19,7 +19,7 @@
 | 模块                   | 简介                                                         |
 | ---------------------- | ------------------------------------------------------------ |
 | newsSpider.py          | 第一版实现功能的代码，只是简单地将代码装在函数内             |
-| bulletin_spider.py     | A modified version of  `newsSpider.py`,with some bugs        |
+| bulletin_spider.py     | 第二版，简单封装为类        |
 | spider_class.py        | 第三版，进一步优化                                           |
 | my_database.py         | 对pymysql模块的简单封装                                      |
 | my_spider.py           | 定义了爬虫类的基类，构造时需要传入MyParser类的解析器，和MyArchiver类的存档器 |
