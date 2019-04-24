@@ -10,9 +10,14 @@ class chdParser(MyParser):
     
     def login_data_parser(self,login_url):
         '''
-        This parser is for chd
-        :param url: the url you want to login
-        :return (a dict with login data,cookies)
+        登录
+        :param login_url: 登录页面的网址
+        :param home_page_url: 登录之后跳转到的页面，一般而言是主页，以下称其为主页
+
+        流程：
+        1.获取登录表单信息（例如账号密码以及隐藏域）
+        2.一步步跳转到主页以获取完整cookies并储存在对象属性当中
+
         '''
         #report
         print('[@parser]:get login data')
