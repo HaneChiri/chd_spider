@@ -94,6 +94,24 @@ class MyDatabase(object):
             return False
 
 
+    def select(self,db,table,column_list):
+        sql='use {}'.format(db)
+        self.execute(sql)
+
+
+        sql='select '
+        i=0
+        for column in column_list:
+            
+            sql+=str(column)
+            i+=1
+            if i<len(column_list):
+                sql+=','
+            
+        
+        sql+=' from {}'.format(table)
+
+        return self.execute(sql)
 
     
 
@@ -118,5 +136,9 @@ if __name__ == "__main__":
 
     mydb=MyDatabase(**db_data)
     
-    mydb.record_isexist('news','spider','title','2019年度因公国公示12')
+    #mydb.record_isexist('news','spider','title','2019年度因公国公示12')
+
+    for i in mydb.select('dbase','spider',['url','title']):
+        print(i)
+
     

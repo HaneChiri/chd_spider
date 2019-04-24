@@ -53,6 +53,9 @@ class MySpider(object):
         self.login(login_url,home_page_url)
         #get urls
         url_list=self.parser.get_urls(catalogue_url,cookies=self.cookies,headers=self.headers)
+        print(len(url_list))
+        url_list=self.archiver.reduce_crawled_url(url_list)
+        print(len(url_list))
         #repeat get page content
         counter=0
         total=len(url_list)

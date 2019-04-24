@@ -21,6 +21,30 @@ class MyArchiver(object):
     def isexist(self,primary_key,find_value):
         return self.db.record_isexist(self.database_name,self.table_name,primary_key,find_value)
 
+    def reduce_crawled_url(self,url_list):
+        result=self.db.select(self.database_name,self.table_name,['url'])
+
+
+        db_url_list=[]
+        for i in result:
+            db_url_list.append(i[0])
+
+
+        uncrawed_url=list(set(url_list) - set(db_url_list))
+        return uncrawed_url
+        
+
+if __name__ == '__main__':
+    connect_config={
+        'host':'127.0.0.1',
+        'user':'root',
+        'passwd':'password',
+        'port':3306,
+        'charset':'utf8',
+    }
+    
+    archiver=MyArchiver('dbase','spider',**connect_config)
+    print(archiver.reduce_crawled_url(['http://portal.chd.edu.cn/detach.portal?.pmn=view&.ia=false&action=bulletinBrowser&.pen=pe65&bulletinId=035be7f3-6022-11e9-952d-7ba9f1ad5e4b']))
 
     
 

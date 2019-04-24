@@ -77,7 +77,7 @@ class chdParser(MyParser):
         url_list=[]
         
         
-        for i in range(1,3+1):
+        for i in range(1,page_num+1):
             para['pageIndex'] = i
             #report
             print("[@parser]:get urls({}%): {}/{}".format(round((i/page_num)*100,1),i,page_num))
@@ -132,6 +132,6 @@ if __name__ == '__main__':
     parser=chdParser()
     archiver=chdArchiver('dbase','spider',**connect_config)
     
-    sp=chdSpider(parser,archiver,**connect_config)
+    sp=chdSpider(parser,archiver)
     sp.crawl(login_url,home_page_url,catalogue_url)
     
