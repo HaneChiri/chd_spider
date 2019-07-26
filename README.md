@@ -2,17 +2,12 @@
 
 爬取学校信息门户公告，并存到数据库
 
-# 我的相关博客
+这个仓库里面存放了好几个版本的信息门户爬虫（整理代码的时候放一起了，并且修改了名字），主要的有两个：
 
-- [1 小说爬虫](https://hanechiri.github.io/post/python_spider_note1simple_spider/)
-- [2 模拟登录与数据库](https://hanechiri.github.io/post/python_spider_note2login_and_database/)
-- [3 爬虫类](https://hanechiri.github.io/post/python_spider_note3class_spider/)
-- [4 模拟登录函数的优化](https://hanechiri.github.io/post/python_spider_note4optimization_of_the_login_function/#more)
-- [5 爬虫类结构优化](https://hanechiri.github.io/post/python_spider_note5optimization_of_the_spider_class/#more)
+- chd_portal_hanespider: 是手动写的，一个面向对象的实现
+- chd_portal_scrapy: 是用了scrapy框架写的
 
-
-
-# 模块简介
+## chd_portal_hanespider
 
 注：历史版本存放在`practice`目录下
 
@@ -27,28 +22,20 @@
 | my_Archiver.py         | 给MySpider类使用的存档器的基类，目前仅支持基于pymysql的数据库存储，以后可能会增加新的存储方式 |
 | chd_bulletin_spider.py | 第四版，爬取长安大学信息门户公告，并存到数据库               |
 
+## 自定义模块
+
+[用于模拟登录长安大学信息门户的自定义包](https://github.com/HaneChiri/chd_portal_login)
 
 
-# 进度
 
-- [x] 模拟登录
+## 我的爬虫学习笔记
 
-- [x] 解析内容
-
-- [x] 本地存储
-
-- [x] 博客总结
-
-- [x] 面向对象
-
-- [x] 结构优化
-
-- [x] 全面注释
-
-- [x] 爬取去重
-
-- [ ] 实时更新
-
-- [ ] 异常处理
-
-  
+- [1 小说爬虫](https://hanechiri.github.io/post/python_spider_note1simple_spider/)
+- [2 模拟登录与数据库](https://hanechiri.github.io/post/python_spider_note2login_and_database/)
+- [3 爬虫类](https://hanechiri.github.io/post/python_spider_note3class_spider/)
+- [4 模拟登录函数的优化](https://hanechiri.github.io/post/python_spider_note4optimization_of_the_login_function/#more)
+- [5 爬虫类结构优化](https://hanechiri.github.io/post/python_spider_note5optimization_of_the_spider_class/#more)
+- [练习利用Scrapy爬取b站排行榜](https://hanechiri.github.io/post/Scrapy_spider_bilibiliRank/)
+- [python相对路径是相对于哪里](https://hanechiri.github.io/post/python_relative_path/)
+- [学校信息门户模拟登录之密码加密](https://hanechiri.github.io/post/portal_login_encrypt/)
+- [学校信息门户模拟登录分析](https://hanechiri.github.io/post/portal_login/)
