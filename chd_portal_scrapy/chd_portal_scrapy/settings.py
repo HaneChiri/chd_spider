@@ -65,9 +65,9 @@ COOKIES_ENABLED = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'chd_portal_scrapy.pipelines.ChdPortalScrapyPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'chd_portal_scrapy.pipelines.BulletinPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -93,3 +93,12 @@ COOKIES_ENABLED = True
 # 自定义设置
 LOGIN_URL = 'http://ids.chd.edu.cn/authserver/login?service=http%3A%2F%2Fportal.chd.edu.cn%2F'
 HOME_URL='http://portal.chd.edu.cn/index.portal?.pn=p167'
+
+MYSQL_DATA={
+    'host':'127.0.0.1',
+    'port':3306,
+    'user':'root',
+    'password':'password',
+    'database':'chd',
+    'table':'bulletins'
+}
